@@ -26,17 +26,20 @@ runs:
         gradle-home-cache-cleanup: true
 
     - name: Update lock
+      shell: bash
       run: |
         rm package-lock.json
         ./gradlew :kotlinStorePackageLock
 
     - id: modified-files
       name: Check modified files
+      shell: bash
       run: |
         echo "list=$( git ls-files --modified )" >> "$GITHUB_OUTPUT"
 
     - name: Commit changes
       if: steps.modified-files.outputs.list == 'package-lock.json'
+      shell: bash
       run: |
         git add package-lock.json
         git config --global user.name "Vitalik"
@@ -45,12 +48,14 @@ runs:
 
     - name: Push changes
       if: steps.modified-files.outputs.list == 'package-lock.json'
+      shell: bash
       run: |
         git checkout -b ${{ inputs.pr_branch }}
         git push -f https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ${{ inputs.pr_branch }}
 
     - id: pr-state
       name: Check PR
+      shell: bash
       if: steps.modified-files.outputs.list == 'package-lock.json'
       run: |
         echo "state=$( gh pr view ${{ inputs.pr_branch }} --json state --jq .state || echo "ABSENT" )" >> "$GITHUB_OUTPUT"
@@ -61,6 +66,7 @@ runs:
       if: >
         steps.modified-files.outputs.list == 'package-lock.json'
         && steps.pr-state.outputs.state != 'OPEN'
+      shell: bash
       run: |
         gh pr create --fill --base ${{ github.ref_name }} --head ${{ inputs.pr_branch }}
       env:
