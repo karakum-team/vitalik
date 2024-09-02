@@ -1,2 +1,11 @@
-# vitalik
-Library inspector for Kotlin/JS
+# Vitalik
+
+```text
+Vit ("fast")
+i
+t
+Automatic
+Library
+Inspector for
+Kotlin/JS
+```
