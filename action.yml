@@ -51,7 +51,7 @@ runs:
       shell: bash
       run: |
         git checkout -b ${{ inputs.pr_branch }}
-        git push -f https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ${{ inputs.pr_branch }}
+        git push -f https://${{ github.token }}@github.com/${{ github.repository }}.git ${{ inputs.pr_branch }}
 
     - id: pr-state
       name: Check PR
@@ -60,7 +60,7 @@ runs:
       run: |
         echo "state=$( gh pr view ${{ inputs.pr_branch }} --json state --jq .state || echo "ABSENT" )" >> "$GITHUB_OUTPUT"
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ github.token }}
 
     - name: Create PR
       if: >
@@ -70,7 +70,7 @@ runs:
       run: |
         gh pr create --fill --base ${{ github.ref_name }} --head ${{ inputs.pr_branch }}
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ github.token }}
 
 branding:
   icon: 'lock'
