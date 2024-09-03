@@ -40,8 +40,8 @@ runs:
       shell: bash
       run: |
         git add package-lock.json
-        git config --global user.name "Vitalik"
-        git config --global user.email "vit@lik"
+        git config --global user.name "${GITHUB_ACTOR}"
+        git config --global user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
         git commit -m "Update \`package-lock.json\`"
 
     - name: Push changes
