@@ -27,12 +27,15 @@ runs:
       name: Check modified files
       shell: bash
       run: |
-        echo "list=$( git ls-files --modified )" >> "$GITHUB_OUTPUT"
+        if git diff --quiet HEAD -- .kotlin-locks/js/package-lock.json &&
+           git diff --quiet HEAD -- .kotlin-locks/wasmjs/package-lock.json; then
+          echo "modified=false" >> $GITHUB_OUTPUT
+        else
+          echo "modified=true" >> $GITHUB_OUTPUT
+        fi
 
     - name: Commit changes
-      if: |
-        contains(steps.modified-files.outputs.list, '.kotlin-locks/js/package-lock.json') ||
-        contains(steps.modified-files.outputs.list, '.kotlin-locks/wasmjs/package-lock.json')
+      if: steps.modified-files.outputs.modified == 'true'
       shell: bash
       run: |
         git add .kotlin-locks/js/package-lock.json
@@ -42,9 +45,7 @@ runs:
         git commit -m "Update \`package-lock.json\` files"
 
     - name: Push changes
-      if: |
-        contains(steps.modified-files.outputs.list, '.kotlin-locks/js/package-lock.json') ||
-        contains(steps.modified-files.outputs.list, '.kotlin-locks/wasmjs/package-lock.json')
+      if: steps.modified-files.outputs.modified == 'true'
       shell: bash
       run: |
         git push https://${{ github.token }}@github.com/${{ github.repository }}.git
