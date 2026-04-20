@@ -20,7 +20,8 @@ runs:
       shell: bash
       run: |
         rm .kotlin-locks/js/package-lock.json
-        ./gradlew :kotlinStorePackageLock
+        rm .kotlin-locks/wasmjs/package-lock.json
+        ./gradlew :kotlinStorePackageLock :kotlinWasmStorePackageLock
 
     - id: modified-files
       name: Check modified files
@@ -29,16 +30,21 @@ runs:
         echo "list=$( git ls-files --modified )" >> "$GITHUB_OUTPUT"
 
     - name: Commit changes
-      if: steps.modified-files.outputs.list == '.kotlin-locks/js/package-lock.json'
+      if: |
+        contains(steps.modified-files.outputs.list, '.kotlin-locks/js/package-lock.json') ||
+        contains(steps.modified-files.outputs.list, '.kotlin-locks/wasmjs/package-lock.json')
       shell: bash
       run: |
         git add .kotlin-locks/js/package-lock.json
+        git add .kotlin-locks/wasmjs/package-lock.json
         git config --global user.name "${GITHUB_ACTOR}"
         git config --global user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
-        git commit -m "Update \`package-lock.json\`"
+        git commit -m "Update \`package-lock.json\` files"
 
     - name: Push changes
-      if: steps.modified-files.outputs.list == '.kotlin-locks/js/package-lock.json'
+      if: |
+        contains(steps.modified-files.outputs.list, '.kotlin-locks/js/package-lock.json') ||
+        contains(steps.modified-files.outputs.list, '.kotlin-locks/wasmjs/package-lock.json')
       shell: bash
       run: |
         git push https://${{ github.token }}@github.com/${{ github.repository }}.git
