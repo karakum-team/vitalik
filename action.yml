@@ -19,7 +19,7 @@ runs:
     - name: Update lock
       shell: bash
       run: |
-        rm package-lock.json
+        rm .kotlin-locks/js/package-lock.json
         ./gradlew :kotlinStorePackageLock
 
     - id: modified-files
@@ -29,16 +29,16 @@ runs:
         echo "list=$( git ls-files --modified )" >> "$GITHUB_OUTPUT"
 
     - name: Commit changes
-      if: steps.modified-files.outputs.list == 'package-lock.json'
+      if: steps.modified-files.outputs.list == '.kotlin-locks/js/package-lock.json'
       shell: bash
       run: |
-        git add package-lock.json
+        git add .kotlin-locks/js/package-lock.json
         git config --global user.name "${GITHUB_ACTOR}"
         git config --global user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
         git commit -m "Update \`package-lock.json\`"
 
     - name: Push changes
-      if: steps.modified-files.outputs.list == 'package-lock.json'
+      if: steps.modified-files.outputs.list == '.kotlin-locks/js/package-lock.json'
       shell: bash
       run: |
         git push https://${{ github.token }}@github.com/${{ github.repository }}.git
